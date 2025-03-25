@@ -3,11 +3,11 @@
 #include <autocharge/Autocharge.hpp>
 
 // put function declarations here:
-void start_chg(SlaveData &slave)
+void start_chg(Master* master, SlaveData &slave)
 {
   Serial.printf("Execute 'start_chg for slave %u'\n", slave.id);
 }
-void end_chg(SlaveData &slave)
+void end_chg(Master* master, SlaveData &slave)
 {
   Serial.printf("Execute 'end_chg for slave %u'\n", slave.id);
 }
