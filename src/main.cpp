@@ -3,31 +3,39 @@
 #include <autocharge/Autocharge.hpp>
 
 // put function declarations here:
-void start_chg(Master* master, SlaveData &slave)
+void step_work(Slave *slave)
 {
-  Serial.printf("Execute 'start_chg for slave %u'\n", slave.id);
+  Serial.printf("Execute 'step_work' for slave %u\n", slave->communication.getNodeId());
 }
-void end_chg(Master* master, SlaveData &slave)
-{
-  Serial.printf("Execute 'end_chg for slave %u'\n", slave.id);
-}
+
+bool step_to_charge(Slave *slave, MasterData &master) {}
+void step_wait_charge(Slave *slave, MasterData &master) {}
+bool step_into_charge(Slave *slave, MasterData &master) {}
+void step_charge(Slave *slave, MasterData &master) {}
+bool step_exit_charge(Slave *slave, MasterData &master) {}
 
 auto chargingSlaves = Fifo<SlaveData *>();
 
-Master master = Master(chargingSlaves,
-                       start_chg,
-                       end_chg);
+auto master = MasterData(4200495932);
+
+Slave slave = Slave(SlaveState::WORK, master, step_work, step_to_charge, step_wait_charge, step_into_charge, step_charge, step_exit_charge);
 
 void setup()
 {
+  delay(2000);
   // put your setup code here, to run once:
-  master.begin();
+  Serial.println("+------------------------+");
+  Serial.println("| Charging Station Slave |");
+  Serial.println("+------------------------+");
+  Serial.println();
+  slave.begin();
   Serial.begin(115200);
+  Serial.println("Setup complete");
 }
 
 void loop()
 {
   // put your main code here, to run repeatedly:
-  delay(1000);
-  master.step();
+  delay(5000);
+  slave.requestCharge();
 }
