@@ -47,17 +47,24 @@ void step_wait_charge(Slave *slave, MasterData &master)
   slave->multiColorLight.setTopLeds(YELLOW);
   delay(3000);
 }
+bool requestedStop = false;
 bool step_into_charge(Slave *slave, MasterData &master)
 {
   slave->multiColorLight.blink(3, GREEN, TOP, 1000);
   slave->multiColorLight.turnOffLed(TOP);
+  requestedStop = false;
   return true;
 }
+
 void step_charge(Slave *slave, MasterData &master)
 {
   slave->multiColorLight.setTopLeds(GREEN);
-  delay(6000);
-  slave->requestStopCharge();
+  delay(15000); // the dezibot should wait here until it is charged full
+  if (!requestedStop)
+  {
+    slave->requestStopCharge();
+    requestedStop = true;
+  }
 }
 bool step_exit_charge(Slave *slave, MasterData &master)
 {
@@ -77,12 +84,12 @@ void setup()
 {
   delay(2000);
   // put your setup code here, to run once:
+  Serial.begin(115200);
   Serial.println("+------------------------+");
   Serial.println("| Charging Station Slave |");
   Serial.println("+------------------------+");
   Serial.println();
   slave.begin();
-  Serial.begin(115200);
   Serial.println("Setup complete");
   slave.multiColorLight.setTopLeds(RED);
 }
@@ -90,7 +97,6 @@ void setup()
 void loop()
 {
   // put your main code here, to run repeatedly:
-  delay(5000);
   slave.step();
 }
 
