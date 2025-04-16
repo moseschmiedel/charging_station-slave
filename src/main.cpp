@@ -17,27 +17,24 @@ bool step_to_charge(Slave *slave, MasterData &master)
 {
   uint32_t last_toggle = 0;
   bool leds_on = false;
-  /*
-    while (findAFriend(slave) != true)
+  while (findAFriend(slave) != true)
+  {
+    uint32_t now = millis();
+    if (now - last_toggle > 1000)
     {
-      uint32_t now = millis();
-      if (now - last_toggle > 1000)
+      if (leds_on)
       {
-        if (leds_on)
-        {
-          slave->multiColorLight.turnOffLed(TOP);
-          leds_on = false;
-        }
-        else
-        {
-          slave->multiColorLight.setTopLeds(YELLOW);
-          leds_on = true;
-        }
-        last_toggle = now;
+        slave->multiColorLight.turnOffLed(TOP);
+        leds_on = false;
       }
+      else
+      {
+        slave->multiColorLight.setTopLeds(YELLOW);
+        leds_on = true;
+      }
+      last_toggle = now;
     }
-  */
-  slave->multiColorLight.blink(3, YELLOW, TOP, 1000);
+  }
   slave->multiColorLight.turnOffLed(TOP);
 
   return true;
@@ -76,7 +73,7 @@ bool step_exit_charge(Slave *slave, MasterData &master)
 
 auto chargingSlaves = Fifo<SlaveData *>();
 
-auto master = MasterData(4200495932);
+auto master = MasterData(4200495964);
 
 Slave slave = Slave(SlaveState::WORK, master, step_work, step_to_charge, step_wait_charge, step_into_charge, step_charge, step_exit_charge);
 
@@ -101,7 +98,7 @@ void loop()
 }
 
 const int centeredThreshold = 50;
-const int STEP_TO_CHARGE_THRESHOLD = 1000;
+const int STEP_TO_CHARGE_THRESHOLD = 5000;
 
 bool findAFriend(Slave *slave)
 {
